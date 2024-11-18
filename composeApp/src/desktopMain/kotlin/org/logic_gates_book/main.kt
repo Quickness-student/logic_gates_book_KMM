@@ -8,6 +8,8 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "logic_gates_book_AIDW",
     ) {
-        App()
+        val hapticFeedback = HapticFeedback()
+        val uri = Uri("https://github.com/Quickness-student/logic_gates_book_KMM.git")
+        App(hapticFeedback = hapticFeedback, uri = uri)
     }
 }

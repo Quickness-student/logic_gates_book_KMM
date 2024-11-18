@@ -6,15 +6,18 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import org.logic_gates_book.HapticFeedback
+import org.logic_gates_book.Uri
+import org.logic_gates_book.ui.screens.book.BookScreen
+import org.logic_gates_book.ui.screens.book.PageScreen
+import org.logic_gates_book.ui.screens.start.StartScreen
 
 /**
  * Composable que define el [NavHost] para la pantalla de inicio de la aplicación.
@@ -22,28 +25,26 @@ import androidx.navigation.compose.composable
  * entre las pantallas de inicio, créditos y libro con animaciones suaves de entrada.
  *
  * @param rememberNavController El controlador de navegación principal para gestionar las rutas.
- * @param padding El espacio de relleno para la pantalla, típicamente proveniente de un scaffold o layout superior.
  *
  * @see Routes.Start.route Ruta de la pantalla de inicio.
  * @see Routes.Credits.route Ruta de la pantalla de créditos.
  * @see Routes.Book.route Ruta de la pantalla del libro.
  */
 @Composable
-fun NavControllerStart(rememberNavController: NavHostController, padding: PaddingValues) {
+fun NavControllerStart(rememberNavController: NavHostController, hapticFeedback: HapticFeedback, uri: Uri) {
     // Definición de las pantallas principales del flujo de inicio
     NavHost(
         navController = rememberNavController,
-        startDestination = "Routes.Start.route", // La pantalla inicial será la de inicio
+        startDestination = Routes.Start.route,
         modifier = Modifier
             .background(colorScheme.background)
-            .fillMaxSize()
-            .padding(padding), // Relleno (padding) para el layout
+            .fillMaxSize(),
         enterTransition = { fadeIn(animationSpec = tween(5000)) }, // Animación de entrada suave
     ) {
         // Definición de las rutas de navegación para las pantallas
-        composable("Routes.Start.route") { "StartScreen(navController = rememberNavController)" }
-        composable("Routes.Credits.route") { "CreditsScreen(navController = rememberNavController)" }
-        composable("Routes.Book.route") { "BookScreen(navController = rememberNavController)" }
+        composable(Routes.Start.route) { StartScreen(navController = rememberNavController, uri = uri) }
+        composable(Routes.Credits.route) { "CreditsScreen(navController = rememberNavController)" }
+        composable(Routes.Book.route) { BookScreen(navController = rememberNavController, hapticFeedback = hapticFeedback) }
     }
 }
 
@@ -59,7 +60,7 @@ fun NavControllerStart(rememberNavController: NavHostController, padding: Paddin
  * @see navControllerControl El controlador de navegación para manejar las transiciones entre las páginas.
  */
 @Composable
-fun NavControllerBook(navController: NavHostController, navControllerHome: NavHostController) {
+fun NavControllerBook(navController: NavHostController, navControllerHome: NavHostController, hapticFeedback: HapticFeedback) {
     // Definición del NavHost para la navegación dentro del libro
     NavHost(navController = navController, startDestination = "page/1") {
         // Composable para las páginas del libro, identificadas por su número de página
@@ -87,20 +88,21 @@ fun NavControllerBook(navController: NavHostController, navControllerHome: NavHo
             // Obtener el número de la página desde la ruta
             val pageNumber = backStackEntry.arguments?.getString("pageNumber")?.toInt() ?: 1
             // Llamamos a PageScreen para mostrar el contenido de la página correspondiente
-//            PageScreen(
-//                pageNumber = pageNumber,
-//                navController = navControllerHome, // Controlador de navegación para la pantalla principal
-//                onNextPage = {
-//                    // Navegar a la siguiente página
-//                    navController.popBackStack() // Eliminar la página actual de la pila
-//                    navController.navigate("page/${pageNumber + 1}") // Navegar a la página siguiente
-//                },
-//                onPreviousPage = {
-//                    // Navegar a la página anterior
-//                    navController.popBackStack() // Eliminar la página actual de la pila
-//                    navController.navigate("page/${pageNumber - 1}") // Navegar a la página anterior
-//                }
-//            )
+            PageScreen(
+                pageNumber = pageNumber,
+                hapticFeedback = hapticFeedback,
+                navController = navControllerHome, // Controlador de navegación para la pantalla principal
+                onNextPage = {
+                    // Navegar a la siguiente página
+                    navController.popBackStack() // Eliminar la página actual de la pila
+                    navController.navigate("page/${pageNumber + 1}") // Navegar a la página siguiente
+                },
+                onPreviousPage = {
+                    // Navegar a la página anterior
+                    navController.popBackStack() // Eliminar la página actual de la pila
+                    navController.navigate("page/${pageNumber - 1}") // Navegar a la página anterior
+                }
+            )
         }
     }
 }

@@ -6,7 +6,9 @@ import kotlinx.browser.document
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
-    ComposeViewport(document.body!!) {
-        App()
+    ComposeViewport(viewportContainer = document.body!!) {
+        val hapticFeedback = HapticFeedback()
+        val uri = Uri("https://github.com/Quickness-student/logic_gates_book_KMM.git")
+        App(hapticFeedback = hapticFeedback, uri = uri)
     }
 }
