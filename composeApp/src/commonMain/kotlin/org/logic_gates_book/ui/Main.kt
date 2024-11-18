@@ -7,7 +7,7 @@ import org.logic_gates_book.Uri
 import org.logic_gates_book.ui.navigation.NavControllerStart
 
 @Composable
-fun Main(hapticFeedback: HapticFeedback, uri: Uri) {
+fun Main(hapticFeedback: HapticFeedback, uri: Uri, screenWidth: Float) {
     val navController = rememberNavController()
-    NavControllerStart(navController, hapticFeedback, uri)
+    NavControllerStart(navController, hapticFeedback, uri, screenWidth)
 }

@@ -10,6 +10,7 @@ fun main() = application {
     ) {
         val hapticFeedback = HapticFeedback()
         val uri = Uri("https://github.com/Quickness-student/logic_gates_book_KMM.git")
-        App(hapticFeedback = hapticFeedback, uri = uri)
+        val screenWidth = ScreenPlatform().getScreenWidth()
+        App(hapticFeedback = hapticFeedback, uri = uri, screenWidth = screenWidth)
     }
 }

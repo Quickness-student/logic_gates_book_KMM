@@ -1,5 +1,7 @@
 package org.logic_gates_book
 
+import androidx.compose.runtime.Composable
+
 
 class IOSPlatform: Platform {
     override val name: String = "IOS"
@@ -16,5 +18,13 @@ actual class HapticFeedback {
 actual class Uri (private val url: String){
     actual fun navigate() {
         // No-op on iOS
+    }
+}
+
+actual class ScreenPlatform {
+    @Composable
+    actual fun getScreenWidth(): Float {
+        // No-op on iOS
+        return 1f
     }
 }

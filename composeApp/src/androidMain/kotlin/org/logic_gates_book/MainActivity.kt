@@ -18,6 +18,7 @@ class MainActivity : ComponentActivity() {
                 url = "https://github.com/Quickness-student/logic_gates_book_KMM.git",
                 context = this
             )
+            val screenWidth = ScreenPlatform(this).getScreenWidth()
             LaunchedEffect(Unit) {
                 systemUiController.isSystemBarsVisible = false
                 systemUiController.setSystemBarsColor(
@@ -25,7 +26,7 @@ class MainActivity : ComponentActivity() {
                     darkIcons = Color.White.luminance() > 0.5f // Determina si los iconos deben ser oscuros o claros
                 )
             }
-            App(hapticFeedback = hapticFeedback, uri = uri)
+            App(hapticFeedback = hapticFeedback, uri = uri, screenWidth = screenWidth)
         }
     }
 }

@@ -7,4 +7,5 @@ import org.logic_gates_book.ui.theme.MaterialThemeApp
 
 @Composable
 @Preview
-fun App(hapticFeedback: HapticFeedback, uri: Uri) = MaterialThemeApp { Main(hapticFeedback, uri) }
+fun App(hapticFeedback: HapticFeedback, uri: Uri, screenWidth: Float) =
+    MaterialThemeApp { Main(hapticFeedback, uri, screenWidth) }

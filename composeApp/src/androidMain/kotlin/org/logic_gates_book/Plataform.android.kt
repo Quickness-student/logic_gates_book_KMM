@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
+import androidx.compose.runtime.Composable
 
 class AndroidPlatform : Platform {
     override val name: String = "Android ${android.os.Build.VERSION.SDK_INT}"
@@ -28,5 +29,12 @@ actual class Uri (url: String, private val context: Context) {
     private val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
     actual fun navigate() {
         context.startActivity(intent)
+    }
+}
+
+actual class ScreenPlatform(private val context: Context) {
+    @Composable
+    actual fun getScreenWidth(): Float {
+        return context.resources.displayMetrics.widthPixels.toFloat()
     }
 }

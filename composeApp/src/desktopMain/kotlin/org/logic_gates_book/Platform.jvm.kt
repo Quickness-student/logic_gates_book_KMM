@@ -1,5 +1,8 @@
 package org.logic_gates_book
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.platform.LocalWindowInfo
 import java.awt.Desktop
 import java.net.URI
 
@@ -26,5 +29,14 @@ actual class Uri (private val url: String){
                 e.printStackTrace()
             }
         }
+    }
+}
+
+actual class ScreenPlatform {
+    @OptIn(ExperimentalComposeUiApi::class)
+    @Composable
+    actual fun getScreenWidth(): Float {
+        val window = LocalWindowInfo.current
+        return window.containerSize.width.toFloat()
     }
 }

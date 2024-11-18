@@ -1,5 +1,6 @@
 package org.logic_gates_book
 
+import androidx.compose.runtime.Composable
 import kotlinx.browser.window
 
 class WasmPlatform: Platform {
@@ -17,5 +18,12 @@ actual class HapticFeedback {
 actual class Uri (private val url: String){
     actual fun navigate() {
         window.location.href = url
+    }
+}
+
+actual class ScreenPlatform {
+    @Composable
+    actual fun getScreenWidth(): Float {
+        return window.innerWidth.toFloat()
     }
 }

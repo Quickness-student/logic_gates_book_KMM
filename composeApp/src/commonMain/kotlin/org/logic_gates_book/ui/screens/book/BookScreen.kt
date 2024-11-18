@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -44,6 +43,16 @@ import logic_gates_book_aidw.composeapp.generated.resources.xor
 import org.jetbrains.compose.resources.painterResource
 import org.logic_gates_book.HapticFeedback
 import org.logic_gates_book.ui.navigation.NavControllerBook
+import org.logic_gates_book.ui.screens.book.pags.CreditsScreen
+import org.logic_gates_book.ui.screens.book.pags.Pag1
+import org.logic_gates_book.ui.screens.book.pags.Pag2
+import org.logic_gates_book.ui.screens.book.pags.Pag3
+import org.logic_gates_book.ui.screens.book.pags.Pag4
+import org.logic_gates_book.ui.screens.book.pags.Pag5
+import org.logic_gates_book.ui.screens.book.pags.Pag6
+import org.logic_gates_book.ui.screens.book.pags.Pag7
+import org.logic_gates_book.ui.screens.book.pags.Pag8
+import org.logic_gates_book.ui.screens.book.pags.TutorialScreen
 import org.logic_gates_book.ui.theme.MaterialThemeApp
 
 /**
@@ -56,17 +65,29 @@ import org.logic_gates_book.ui.theme.MaterialThemeApp
  * @param navController Controlador de navegación utilizado para cambiar entre las pantallas del libro.
  */
 @Composable
-fun BookScreen(navController: NavHostController, hapticFeedback: HapticFeedback) =
-    MaterialThemeApp { Screen(navController, hapticFeedback) }
+fun BookScreen(
+    navController: NavHostController,
+    hapticFeedback: HapticFeedback,
+    screenWidth: Float
+) = MaterialThemeApp { Screen(navController, hapticFeedback, screenWidth) }
 
 /**
  * Composable que organiza la navegación entre las pantallas dentro del libro.
  * @param navControllerHome Controlador de navegación principal de la aplicación.
  */
 @Composable
-fun Screen(navControllerHome: NavHostController, hapticFeedback: HapticFeedback) {
+fun Screen(
+    navControllerHome: NavHostController,
+    hapticFeedback: HapticFeedback,
+    screenWidth: Float
+) {
     val navController = rememberNavController()
-    NavControllerBook(navController = navController, navControllerHome = navControllerHome, hapticFeedback = hapticFeedback)
+    NavControllerBook(
+        navController = navController,
+        navControllerHome = navControllerHome,
+        hapticFeedback = hapticFeedback,
+        screenWidth = screenWidth
+    )
 }
 
 /**
@@ -83,6 +104,7 @@ fun PageScreen(
     pageNumber: Int,
     navController: NavController,
     hapticFeedback: HapticFeedback,
+    screenWidth: Float,
     onNextPage: () -> Unit,
     onPreviousPage: () -> Unit
 ) {
@@ -103,7 +125,8 @@ fun PageScreen(
         activeDouble = activeDouble,
         activeXor = activeXor,
         activeLatch = activeLatch,
-        navController = navController
+        navController = navController,
+        screenWidth = screenWidth
     )
 
     if (pageNumber < 10)
@@ -119,12 +142,14 @@ fun PageScreen(
             touch = touch,
             onNextPage = onNextPage,
             onPreviousPage = onPreviousPage,
-            gate = gate
+            gate = gate,
+            screenWidth = screenWidth
         )
 
     Tutorial(
         pageNumber = pageNumber,
-        tutorial = tutorial
+        tutorial = tutorial,
+        screenWidth = screenWidth
     )
 
     Gate(
@@ -253,6 +278,7 @@ private fun Controller(
     hapticFeedback: HapticFeedback,
     gate: MutableState<Boolean>,
     touch: MutableIntState,
+    screenWidth: Float,
     onNextPage: () -> Unit,
     onPreviousPage: () -> Unit,
 ) {
@@ -260,6 +286,11 @@ private fun Controller(
         targetValue = if (!gate.value) Color.Transparent else Color.Black.copy(alpha = 0.9f),
         animationSpec = tween(durationMillis = 500), label = ""
     )
+
+    val centerZoneStart = 0.3f * screenWidth
+    val centerZoneEnd = 0.7f * screenWidth
+    val leftZoneEnd = 0.3f * screenWidth
+    val rightZoneStart = 0.7f * screenWidth
 
     Box(
         modifier = Modifier
@@ -271,24 +302,24 @@ private fun Controller(
                         if (active.value || activeDouble.value || activeXor.value || activeLatch.value || pageNumber == 1 || pageNumber == 2)
                             complete.value = true
 
-//                        if (offset.x in centerZoneStart..centerZoneEnd) {
-//                            active.value = true
-//                            activeLatch.value = true
-//
-//                            hapticFeedback.vibrate(50)
-//
-//                            tryAwaitRelease()
-//                            active.value = false
-//                        } else {
-//                            if (offset.x < leftZoneEnd && pageNumber > 2) {
-//                                onPreviousPage()
-//                            } else if (offset.x > rightZoneStart && pageNumber < 10) {
-//                                if (complete.value || pageNumber == 9) {
-//                                    onNextPage()
-//                                    complete.value = false
-//                                }
-//                            }
-//                        }
+                        if (offset.x in centerZoneStart..centerZoneEnd) {
+                            active.value = true
+                            activeLatch.value = true
+
+                            hapticFeedback.vibrate(50)
+
+                            tryAwaitRelease()
+                            active.value = false
+                        } else {
+                            if (offset.x < leftZoneEnd && pageNumber > 2) {
+                                onPreviousPage()
+                            } else if (offset.x > rightZoneStart && pageNumber < 10) {
+                                if (complete.value || pageNumber == 9) {
+                                    onNextPage()
+                                    complete.value = false
+                                }
+                            }
+                        }
                     },
                     onDoubleTap = {
                         activeLatch.value = false
@@ -301,34 +332,34 @@ private fun Controller(
                         val event = awaitPointerEvent()
                         val pointers = event.changes
 
-//                        when (pointers.size) {
-//                            1 -> {
-//                                val singleTouchInCenter = pointers.all { change ->
-//                                    change.position.x in centerZoneStart..centerZoneEnd && change.pressed
-//                                }
-//                                touch.intValue = 1
-//                                activeOr.value = true
-//                                activeDouble.value = false
-//                                activeXor.value = singleTouchInCenter
-//                            }
-//
-//                            2 -> {
-//                                val bothTouchesInCenter = pointers.all { change ->
-//                                    change.position.x in centerZoneStart..centerZoneEnd && change.pressed
-//                                }
-//                                touch.intValue = 2
-//                                activeOr.value = true
-//                                activeDouble.value = bothTouchesInCenter
-//                                activeXor.value = false
-//                            }
-//
-//                            else -> {
-//                                touch.intValue = 0
-//                                activeOr.value = false
-//                                activeDouble.value = false
-//                                activeXor.value = false
-//                            }
-//                        }
+                        when (pointers.size) {
+                            1 -> {
+                                val singleTouchInCenter = pointers.all { change ->
+                                    change.position.x in centerZoneStart..centerZoneEnd && change.pressed
+                                }
+                                touch.intValue = 1
+                                activeOr.value = true
+                                activeDouble.value = false
+                                activeXor.value = singleTouchInCenter
+                            }
+
+                            2 -> {
+                                val bothTouchesInCenter = pointers.all { change ->
+                                    change.position.x in centerZoneStart..centerZoneEnd && change.pressed
+                                }
+                                touch.intValue = 2
+                                activeOr.value = true
+                                activeDouble.value = bothTouchesInCenter
+                                activeXor.value = false
+                            }
+
+                            else -> {
+                                touch.intValue = 0
+                                activeOr.value = false
+                                activeDouble.value = false
+                                activeXor.value = false
+                            }
+                        }
                     }
                 }
             }
@@ -355,20 +386,21 @@ private fun Pages(
     activeDouble: MutableState<Boolean>,
     activeXor: MutableState<Boolean>,
     activeLatch: MutableState<Boolean>,
+    screenWidth: Float,
     navController: NavController
 ) {
-//    when (pageNumber) {
-//        1 -> TutorialScreen() //Tutorial
-//        2 -> Pag1() //Introducción
-//        3 -> Pag2(active.value) //Wire
-//        4 -> Pag3(active.value) //Not
-//        5 -> Pag4(active.value, touch.intValue) //Or
-//        6 -> Pag5(activeDouble.value) //And
-//        7 -> Pag6(activeXor.value) //Xor
-//        8 -> Pag7(activeLatch.value) //Latch
-//        9 -> Pag8() //Final
-//        10 -> CreditsScreen(navController = navController) //Créditos
-//    }
+    when (pageNumber) {
+        1 -> TutorialScreen(screenWidth) //Tutorial
+        2 -> Pag1() //Introducción
+        3 -> Pag2(active.value) //Wire
+        4 -> Pag3(active.value) //Not
+        5 -> Pag4(active.value, touch.intValue) //Or
+        6 -> Pag5(activeDouble.value) //And
+        7 -> Pag6(activeXor.value) //Xor
+        8 -> Pag7(activeLatch.value) //Latch
+        9 -> Pag8() //Final
+        10 -> CreditsScreen(navController = navController) //Créditos
+    }
 }
 
 /**
@@ -379,18 +411,18 @@ private fun Pages(
  * @param tutorial Estado mutable que indica si el tutorial está visible o no.
  */
 @Composable
-fun Tutorial(pageNumber: Int, tutorial: MutableState<Boolean>) {
+fun Tutorial(pageNumber: Int, tutorial: MutableState<Boolean>, screenWidth: Float) {
     if (pageNumber >= 3 && pageNumber <= 8) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.TopEnd
         ) {
             IconButton(onClick = { tutorial.value = !tutorial.value }) {
-//                Icon(
-//                    painter = painterResource(Res.drawable.baseline_info_24),
-//                    contentDescription = "Mostrar tutorial",
-//                    tint = colorScheme.tertiary
-//                )
+                Icon(
+                    painter = painterResource(Res.drawable.baseline_info_24),
+                    contentDescription = "Mostrar tutorial",
+                    tint = colorScheme.tertiary
+                )
             }
         }
     }
@@ -405,7 +437,7 @@ fun Tutorial(pageNumber: Int, tutorial: MutableState<Boolean>) {
                 .clickable { tutorial.value = false }, // Hacer clic fuera cierra el tutorial
             contentAlignment = Alignment.Center
         ) {
-            //Tutorial()
+            org.logic_gates_book.ui.components.Tutorial(screenWidth )
         }
     }
 }

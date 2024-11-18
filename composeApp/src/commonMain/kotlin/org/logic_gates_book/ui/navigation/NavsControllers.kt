@@ -31,7 +31,12 @@ import org.logic_gates_book.ui.screens.start.StartScreen
  * @see Routes.Book.route Ruta de la pantalla del libro.
  */
 @Composable
-fun NavControllerStart(rememberNavController: NavHostController, hapticFeedback: HapticFeedback, uri: Uri) {
+fun NavControllerStart(
+    rememberNavController: NavHostController,
+    hapticFeedback: HapticFeedback,
+    uri: Uri,
+    screenWidth: Float
+) {
     // Definición de las pantallas principales del flujo de inicio
     NavHost(
         navController = rememberNavController,
@@ -42,9 +47,20 @@ fun NavControllerStart(rememberNavController: NavHostController, hapticFeedback:
         enterTransition = { fadeIn(animationSpec = tween(5000)) }, // Animación de entrada suave
     ) {
         // Definición de las rutas de navegación para las pantallas
-        composable(Routes.Start.route) { StartScreen(navController = rememberNavController, uri = uri) }
+        composable(Routes.Start.route) {
+            StartScreen(
+                navController = rememberNavController,
+                uri = uri
+            )
+        }
         composable(Routes.Credits.route) { "CreditsScreen(navController = rememberNavController)" }
-        composable(Routes.Book.route) { BookScreen(navController = rememberNavController, hapticFeedback = hapticFeedback) }
+        composable(Routes.Book.route) {
+            BookScreen(
+                navController = rememberNavController,
+                hapticFeedback = hapticFeedback,
+                screenWidth = screenWidth
+            )
+        }
     }
 }
 
@@ -60,7 +76,12 @@ fun NavControllerStart(rememberNavController: NavHostController, hapticFeedback:
  * @see navControllerControl El controlador de navegación para manejar las transiciones entre las páginas.
  */
 @Composable
-fun NavControllerBook(navController: NavHostController, navControllerHome: NavHostController, hapticFeedback: HapticFeedback) {
+fun NavControllerBook(
+    navController: NavHostController,
+    navControllerHome: NavHostController,
+    hapticFeedback: HapticFeedback,
+    screenWidth: Float
+) {
     // Definición del NavHost para la navegación dentro del libro
     NavHost(navController = navController, startDestination = "page/1") {
         // Composable para las páginas del libro, identificadas por su número de página
@@ -91,6 +112,7 @@ fun NavControllerBook(navController: NavHostController, navControllerHome: NavHo
             PageScreen(
                 pageNumber = pageNumber,
                 hapticFeedback = hapticFeedback,
+                screenWidth = screenWidth,
                 navController = navControllerHome, // Controlador de navegación para la pantalla principal
                 onNextPage = {
                     // Navegar a la siguiente página
